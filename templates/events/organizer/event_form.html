@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{% if event %}Edit {{ event.title }}{% else %}New event{% endif %}{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <div class="card mx-auto wide-panel">
+      <div class="card-body p-4 p-md-5">
+        <h1 class="h3 fw-bold mb-1">{% if event %}Edit event{% else %}New event{% endif %}</h1>
+        <p class="text-body-secondary mb-4">{% if event %}Changes apply immediately.{% else %}New events start as drafts; customers cannot see them yet.{% endif %}</p>
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger" role="alert">{% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}</div>
+        {% endif %}
+        <form method="post" data-submit-once novalidate>
+          {% csrf_token %}
+          {% for field in form %}{% include "partials/field.html" %}{% endfor %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary" data-loading-text="Saving...">{% if event %}Save changes{% else %}Create draft{% endif %}</button>
+            <a class="btn btn-outline-secondary" href="{% if event %}{% url 'organizer-event-manage' event.pk %}{% else %}{% url 'organizer-events' %}{% endif %}">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

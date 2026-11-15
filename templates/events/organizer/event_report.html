@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Report: {{ report.title }}{% endblock %}
+
+{% block content %}
+  <section class="page-header">
+    <div class="container">
+      <nav aria-label="breadcrumb"><ol class="breadcrumb small mb-2"><li class="breadcrumb-item"><a href="{% url 'organizer-events' %}">My events</a></li><li class="breadcrumb-item"><a href="{% url 'organizer-event-manage' report.event_id %}">{{ report.title }}</a></li><li class="breadcrumb-item active" aria-current="page">Report</li></ol></nav>
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <h1 class="display-6 mb-0">Sales report</h1>
+        {% include "partials/event_status_badge.html" with status=report.status %}
+      </div>
+      <p class="text-body-secondary mt-2 mb-0">{{ report.title }} &middot; {{ report.starts_at|date:"j M Y, H:i" }} UTC</p>
+    </div>
+  </section>
+
+  <section class="container" aria-label="Report figures">
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3"><div class="stat"><div class="small text-body-secondary"><i class="bi bi-lock-fill me-1" aria-hidden="true"></i>Sold</div><div class="stat-value" data-seats-sold>{{ report.seats_sold }}</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat"><div class="small text-body-secondary"><i class="bi bi-hourglass-split me-1" aria-hidden="true"></i>Held</div><div class="stat-value" data-seats-held>{{ report.seats_held }}</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat"><div class="small text-body-secondary"><i class="bi bi-square me-1" aria-hidden="true"></i>Available</div><div class="stat-value" data-seats-available>{{ report.seats_available }}</div></div></div>
+      <div class="col-6 col-md-3"><div class="stat"><div class="small text-body-secondary"><i class="bi bi-grid-3x3-gap me-1" aria-hidden="true"></i>Total seats</div><div class="stat-value">{{ report.seats_total }}</div></div></div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between mb-2"><h2 class="h6 fw-bold mb-0">Occupancy</h2><span class="fw-bold" data-occupancy>{{ report.occupancy_percent }}%</span></div>
+        <progress class="occupancy-bar w-100" max="100" value="{{ report.occupancy_percent }}" aria-label="Occupancy {{ report.occupancy_percent }}%">{{ report.occupancy_percent }}%</progress>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-12 col-lg-6">
+        <div class="card h-100">
+          <div class="card-body p-4">
+            <h2 class="h6 fw-bold mb-3">Revenue</h2>
+            <dl class="row mb-0">
+              <dt class="col-7 fw-normal">Gross (successful payments)</dt><dd class="col-5 text-end" data-gross>{{ report.gross_revenue }}</dd>
+              <dt class="col-7 fw-normal">Refunded</dt><dd class="col-5 text-end" data-refunded>{{ report.refunded_amount }}</dd>
+              <dt class="col-7">Net</dt><dd class="col-5 text-end fw-bold" data-net>{{ report.net_revenue }}</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-6">
+        <div class="card h-100">
+          <div class="card-body p-4">
+            <h2 class="h6 fw-bold mb-3">Bookings per day</h2>
+            {% if daily %}
+              <table class="table table-sm mb-0">
+                <thead><tr><th scope="col">Day (UTC)</th><th scope="col" class="text-end">Bookings</th></tr></thead>
+                <tbody>{% for row in daily %}<tr><td>{{ row.day|date:"j M Y" }}</td><td class="text-end">{{ row.bookings }}</td></tr>{% endfor %}</tbody>
+              </table>
+            {% else %}
+              <p class="text-body-secondary mb-0">No confirmed bookings yet.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

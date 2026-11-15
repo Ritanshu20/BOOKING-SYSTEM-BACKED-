@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Too many requests{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <div class="empty-state card mx-auto narrow-panel">
+      <i class="bi bi-speedometer2" aria-hidden="true"></i>
+      <h1 class="h4 mt-3">Slow down a little</h1>
+      <p class="mb-4">Too many attempts in a short time. Please wait a minute and try again.</p>
+      <a class="btn btn-primary" href="{% url 'home' %}">Back to events</a>
+    </div>
+  </div>
+{% endblock %}

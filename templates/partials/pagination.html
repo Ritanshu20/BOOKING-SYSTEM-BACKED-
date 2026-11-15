@@ -1,0 +1,18 @@
+{# Pagination for a Django Page object. Expects: page, query_string (filters without page). #}
+{% if page.paginator.num_pages > 1 %}
+  <nav aria-label="Pages" class="mt-4">
+    <ul class="pagination justify-content-center flex-wrap">
+      {% if page.has_previous %}
+        <li class="page-item"><a class="page-link" href="?{% if query_string %}{{ query_string }}&amp;{% endif %}page={{ page.previous_page_number }}"><i class="bi bi-chevron-left" aria-hidden="true"></i> Previous</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link"><i class="bi bi-chevron-left" aria-hidden="true"></i> Previous</span></li>
+      {% endif %}
+      <li class="page-item active" aria-current="page"><span class="page-link">Page {{ page.number }} of {{ page.paginator.num_pages }}</span></li>
+      {% if page.has_next %}
+        <li class="page-item"><a class="page-link" href="?{% if query_string %}{{ query_string }}&amp;{% endif %}page={{ page.next_page_number }}">Next <i class="bi bi-chevron-right" aria-hidden="true"></i></a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">Next <i class="bi bi-chevron-right" aria-hidden="true"></i></span></li>
+      {% endif %}
+    </ul>
+  </nav>
+{% endif %}

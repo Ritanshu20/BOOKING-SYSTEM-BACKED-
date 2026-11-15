@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Seats for {{ event.title }}{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <div class="card mx-auto wide-panel">
+      <div class="card-body p-4 p-md-5">
+        <h1 class="h3 fw-bold mb-1">Generate seats</h1>
+        <p class="text-body-secondary mb-4">{{ event.title }}. Rows are labelled A, B, C ... from the stage. Price tiers apply from the front row backwards and must cover every row exactly once.</p>
+        {% if grid_form.non_field_errors or tiers.non_form_errors %}
+          <div class="alert alert-danger" role="alert">
+            {% for error in grid_form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+            {% for error in tiers.non_form_errors %}<div>{{ error }}</div>{% endfor %}
+          </div>
+        {% endif %}
+        <form method="post" data-submit-once novalidate>
+          {% csrf_token %}
+          <div class="row g-3">
+            {% for field in grid_form %}<div class="col-sm-6">{% include "partials/field.html" %}</div>{% endfor %}
+          </div>
+          <fieldset class="mt-2">
+            <legend class="h6 fw-bold">Price tiers</legend>
+            <p class="small text-body-secondary">Example: 10 rows as 2 rows at 250.00, then 8 rows at 150.00. Leave unused tiers empty.</p>
+            {{ tiers.management_form }}
+            {% for tier in tiers %}
+              <div class="row g-3 surface-muted p-2 mb-2 mx-0">
+                <div class="col-12 small fw-semibold">Tier {{ forloop.counter }}</div>
+                {% for field in tier %}<div class="col-sm-6">{% include "partials/field.html" %}</div>{% endfor %}
+              </div>
+            {% endfor %}
+          </fieldset>
+          <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-primary" data-loading-text="Creating seats..."><i class="bi bi-grid-3x3-gap me-1" aria-hidden="true"></i>Create seats</button>
+            <a class="btn btn-outline-secondary" href="{% url 'organizer-event-manage' event.pk %}">Back</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

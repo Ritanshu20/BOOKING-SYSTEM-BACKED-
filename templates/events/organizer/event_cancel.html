@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Cancel {{ event.title }}{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <div class="card mx-auto narrow-panel">
+      <div class="card-body p-4 p-md-5">
+        <h1 class="h4 fw-bold mb-1">Cancel this event?</h1>
+        <p class="text-body-secondary">{{ event.title }} &middot; {{ event.starts_at|date:"j M Y, H:i" }} UTC</p>
+        {% if event.status == "cancelled" %}
+          <p class="my-4">This event is already cancelled.</p>
+        {% else %}
+          <div class="surface-muted p-3 my-4" aria-label="Cancellation summary">
+            <div class="d-flex justify-content-between"><span>Bookings to cancel</span><strong data-bookings-to-cancel>{{ preview.bookings_to_cancel }}</strong></div>
+            <div class="d-flex justify-content-between"><span>Paid bookings to refund (100%)</span><strong data-bookings-to-refund>{{ preview.bookings_to_refund }}</strong></div>
+            <hr>
+            <div class="d-flex justify-content-between fw-bold fs-5"><span>Total refunded</span><span data-refund-total>{{ preview.refund_total }}</span></div>
+          </div>
+          <p class="small text-body-secondary">Everything happens in one transaction: all seats are released, every paid booking is refunded in full, and the event disappears from the public list. This cannot be undone.</p>
+          <form method="post" data-submit-once class="d-flex gap-2 mt-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" data-loading-text="Cancelling event..."><i class="bi bi-x-octagon me-1" aria-hidden="true"></i>Yes, cancel the event</button>
+            <a class="btn btn-outline-secondary" href="{% url 'organizer-event-manage' event.pk %}">Keep it</a>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

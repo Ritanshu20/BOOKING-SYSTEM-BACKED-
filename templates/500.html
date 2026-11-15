@@ -1,0 +1,17 @@
+{% load static %}<!doctype html>
+{# Standalone on purpose: Django renders 500.html without a request or context processors. #}
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Something went wrong | Booking</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+  <main class="empty-state">
+    <h1>Something went wrong</h1>
+    <p>An unexpected error happened on our side. Your bookings and payments are safe; please try again in a moment.</p>
+    <p><a href="/">Back to events</a></p>
+  </main>
+</body>
+</html>

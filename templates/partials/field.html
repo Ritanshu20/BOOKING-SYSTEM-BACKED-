@@ -1,0 +1,21 @@
+{# One form field with its label, help text and errors. Expects: field #}
+<div class="mb-3">
+  {% if field.field.widget.input_type == "radio" %}
+    <fieldset>
+      <legend class="form-label fs-6 fw-semibold">{{ field.label }}</legend>
+      {% for choice in field %}
+        <div class="form-check form-check-inline">
+          {{ choice.tag }}
+          <label class="form-check-label" for="{{ choice.id_for_label }}">{{ choice.choice_label }}</label>
+        </div>
+      {% endfor %}
+    </fieldset>
+  {% else %}
+    <label class="form-label fw-semibold" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+  {% endif %}
+  {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+  {% for error in field.errors %}
+    <div class="invalid-feedback d-block"><i class="bi bi-exclamation-circle me-1" aria-hidden="true"></i>{{ error }}</div>
+  {% endfor %}
+</div>

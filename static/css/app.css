@@ -1,0 +1,428 @@
+/*
+ * Booking design system.
+ *
+ * Bootstrap 5 is the base; this file defines the project's tokens (colour, spacing,
+ * radius, shadow) as CSS variables and maps Bootstrap onto them. Dark mode follows the
+ * operating system through prefers-color-scheme (static/js/theme.js sets Bootstrap's
+ * data-bs-theme to match). Seat states always combine colour with an icon and a text
+ * label, so colour is never the only signal.
+ */
+
+:root {
+  --bk-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --bk-primary: #4f46e5;
+  --bk-primary-hover: #4338ca;
+  --bk-primary-soft: #eef2ff;
+  --bk-on-primary: #ffffff;
+
+  --bk-bg: #f6f7fb;
+  --bk-surface: #ffffff;
+  --bk-surface-muted: #f1f3f9;
+  --bk-text: #1b2033;
+  --bk-text-muted: #545d70;
+  --bk-border: #e3e6ef;
+  --bk-focus: #f59e0b;
+
+  --bk-seat-available-bg: #dcfce7;
+  --bk-seat-available-fg: #14532d;
+  --bk-seat-available-border: #86efac;
+  --bk-seat-held-bg: #fef3c7;
+  --bk-seat-held-fg: #78350f;
+  --bk-seat-held-border: #fcd34d;
+  --bk-seat-booked-bg: #e5e7eb;
+  --bk-seat-booked-fg: #374151;
+  --bk-seat-booked-border: #cbd2dc;
+  --bk-seat-selected-bg: var(--bk-primary);
+  --bk-seat-selected-fg: var(--bk-on-primary);
+
+  --bk-space-1: 0.25rem;
+  --bk-space-2: 0.5rem;
+  --bk-space-3: 1rem;
+  --bk-space-4: 1.5rem;
+  --bk-space-5: 2.5rem;
+
+  --bk-radius-sm: 0.5rem;
+  --bk-radius: 0.875rem;
+  --bk-radius-lg: 1.25rem;
+
+  --bk-shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.06), 0 1px 3px rgba(17, 24, 39, 0.08);
+  --bk-shadow: 0 6px 24px rgba(17, 24, 39, 0.08);
+  --bk-transition: 160ms ease;
+
+  /* Map Bootstrap onto the tokens. */
+  --bs-body-font-family: var(--bk-font);
+  --bs-body-bg: var(--bk-bg);
+  --bs-body-color: var(--bk-text);
+  --bs-secondary-color: var(--bk-text-muted);
+  --bs-border-color: var(--bk-border);
+  --bs-primary: var(--bk-primary);
+  --bs-primary-rgb: 79, 70, 229;
+  --bs-link-color: var(--bk-primary);
+  --bs-link-color-rgb: 79, 70, 229;
+  --bs-link-hover-color: var(--bk-primary-hover);
+  --bs-border-radius: var(--bk-radius-sm);
+  --bs-border-radius-lg: var(--bk-radius);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bk-primary: #8b93ff;
+    --bk-primary-hover: #a5acff;
+    --bk-primary-soft: #1e2140;
+    --bk-on-primary: #0d1022;
+
+    --bk-bg: #0d1117;
+    --bk-surface: #161b26;
+    --bk-surface-muted: #1d2330;
+    --bk-text: #e6e9f2;
+    --bk-text-muted: #a3abbd;
+    --bk-border: #2a3142;
+
+    --bk-seat-available-bg: #0f3a24;
+    --bk-seat-available-fg: #bbf7d0;
+    --bk-seat-available-border: #1f7a4a;
+    --bk-seat-held-bg: #43300a;
+    --bk-seat-held-fg: #fde68a;
+    --bk-seat-held-border: #a16207;
+    --bk-seat-booked-bg: #262b36;
+    --bk-seat-booked-fg: #c7ccd8;
+    --bk-seat-booked-border: #3b4252;
+
+    --bk-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --bk-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+
+    --bs-primary-rgb: 139, 147, 255;
+    --bs-link-color-rgb: 139, 147, 255;
+  }
+}
+
+body {
+  background: var(--bk-bg);
+  color: var(--bk-text);
+  font-family: var(--bk-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------- layout */
+
+.site-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  background: color-mix(in srgb, var(--bk-surface) 88%, transparent);
+  backdrop-filter: saturate(160%) blur(10px);
+  border-bottom: 1px solid var(--bk-border);
+}
+
+.brand-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--bk-radius-sm);
+  background: var(--bk-primary);
+  color: var(--bk-on-primary);
+}
+
+.page-header {
+  padding-block: var(--bk-space-5) var(--bk-space-4);
+}
+
+.page-header h1 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.site-footer {
+  color: var(--bk-text-muted);
+  border-top: 1px solid var(--bk-border);
+}
+
+/* ----------------------------------------------------------- components */
+
+.card {
+  --bs-card-bg: var(--bk-surface);
+  --bs-card-border-color: var(--bk-border);
+  --bs-card-border-radius: var(--bk-radius);
+  box-shadow: var(--bk-shadow-sm);
+  transition: transform var(--bk-transition), box-shadow var(--bk-transition);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--bk-shadow);
+}
+
+.surface-muted {
+  background: var(--bk-surface-muted);
+  border-radius: var(--bk-radius);
+}
+
+.btn {
+  border-radius: var(--bk-radius-sm);
+  font-weight: 600;
+  transition: background-color var(--bk-transition), border-color var(--bk-transition),
+    box-shadow var(--bk-transition), transform var(--bk-transition);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--bk-primary);
+  --bs-btn-border-color: var(--bk-primary);
+  --bs-btn-color: var(--bk-on-primary);
+  --bs-btn-hover-bg: var(--bk-primary-hover);
+  --bs-btn-hover-border-color: var(--bk-primary-hover);
+  --bs-btn-hover-color: var(--bk-on-primary);
+  --bs-btn-active-bg: var(--bk-primary-hover);
+  --bs-btn-active-border-color: var(--bk-primary-hover);
+  --bs-btn-active-color: var(--bk-on-primary);
+  --bs-btn-disabled-bg: var(--bk-primary);
+  --bs-btn-disabled-border-color: var(--bk-primary);
+  --bs-btn-disabled-color: var(--bk-on-primary);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--bk-primary);
+  --bs-btn-border-color: var(--bk-primary);
+  --bs-btn-hover-bg: var(--bk-primary);
+  --bs-btn-hover-border-color: var(--bk-primary);
+  --bs-btn-hover-color: var(--bk-on-primary);
+}
+
+.badge {
+  border-radius: 999px;
+  font-weight: 600;
+  padding: 0.4em 0.75em;
+}
+
+.form-control,
+.form-select {
+  border-radius: var(--bk-radius-sm);
+  background-color: var(--bk-surface);
+  border-color: var(--bk-border);
+}
+
+.stat {
+  padding: var(--bk-space-3);
+  border: 1px solid var(--bk-border);
+  border-radius: var(--bk-radius);
+  background: var(--bk-surface);
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.empty-state {
+  padding: var(--bk-space-5) var(--bk-space-3);
+  text-align: center;
+  color: var(--bk-text-muted);
+}
+
+.empty-state .bi {
+  font-size: 2.5rem;
+  color: var(--bk-primary);
+}
+
+/* Visible keyboard focus everywhere. */
+:focus-visible,
+.btn:focus-visible,
+.form-control:focus-visible,
+.form-select:focus-visible {
+  outline: 3px solid var(--bk-focus);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* ------------------------------------------------------------ seat grid */
+
+.stage {
+  margin-inline: auto;
+  max-width: 28rem;
+  padding: var(--bk-space-2);
+  text-align: center;
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--bk-text-muted);
+  border-radius: var(--bk-radius-lg) var(--bk-radius-lg) 0 0;
+  background: linear-gradient(180deg, var(--bk-primary-soft), transparent);
+  border-top: 3px solid var(--bk-primary);
+}
+
+.seat-grid {
+  overflow-x: auto;
+  padding: var(--bk-space-3) var(--bk-space-1);
+}
+
+.seat-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-width: max-content;
+  margin-bottom: 0.375rem;
+}
+
+.seat-row-label {
+  width: 1.5rem;
+  font-weight: 700;
+  color: var(--bk-text-muted);
+  text-align: center;
+}
+
+.seat-input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.seat {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 2px solid transparent;
+  border-radius: 0.6rem 0.6rem 0.9rem 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+  transition: background-color var(--bk-transition), transform var(--bk-transition),
+    box-shadow var(--bk-transition);
+}
+
+.seat .bi {
+  font-size: 0.8rem;
+  margin-bottom: 2px;
+}
+
+.seat-available {
+  background: var(--bk-seat-available-bg);
+  color: var(--bk-seat-available-fg);
+  border-color: var(--bk-seat-available-border);
+  cursor: pointer;
+}
+
+.seat-available:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--bk-shadow-sm);
+}
+
+.seat-held {
+  background: var(--bk-seat-held-bg);
+  color: var(--bk-seat-held-fg);
+  border-color: var(--bk-seat-held-border);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+.seat-booked {
+  background: var(--bk-seat-booked-bg);
+  color: var(--bk-seat-booked-fg);
+  border-color: var(--bk-seat-booked-border);
+  cursor: not-allowed;
+}
+
+.seat .icon-selected {
+  display: none;
+}
+
+.seat-selected-sample,
+.seat-input:checked + .seat {
+  background: var(--bk-seat-selected-bg);
+  color: var(--bk-seat-selected-fg);
+  border-color: var(--bk-seat-selected-bg);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bk-primary) 30%, transparent);
+}
+
+.seat-input:checked + .seat .icon-selected {
+  display: inline-block;
+}
+
+.seat-input:checked + .seat .icon-available {
+  display: none;
+}
+
+.seat-input:focus-visible + .seat {
+  outline: 3px solid var(--bk-focus);
+  outline-offset: 2px;
+}
+
+.seat-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bk-space-3);
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.seat-legend .seat {
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+.selection-summary {
+  position: sticky;
+  bottom: var(--bk-space-3);
+  z-index: 10;
+}
+
+/* -------------------------------------------------------------- toasts */
+
+.toast-stack {
+  position: fixed;
+  top: 4.5rem;
+  right: var(--bk-space-3);
+  left: var(--bk-space-3);
+  z-index: 1090;
+  display: grid;
+  justify-items: end;
+  gap: var(--bk-space-2);
+  pointer-events: none;
+}
+
+.toast-stack .toast {
+  pointer-events: auto;
+  max-width: 26rem;
+  width: 100%;
+  border-radius: var(--bk-radius);
+  box-shadow: var(--bk-shadow);
+}
+
+.countdown {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 1.75rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.narrow-panel {
+  max-width: 32rem;
+}
+
+.wide-panel {
+  max-width: 44rem;
+}
+
+.occupancy-bar {
+  height: 0.9rem;
+  accent-color: var(--bk-primary);
+}

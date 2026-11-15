@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+  <section class="page-header">
+    <div class="container">
+      <nav aria-label="breadcrumb"><ol class="breadcrumb small mb-2"><li class="breadcrumb-item"><a href="{% url 'home' %}">Events</a></li><li class="breadcrumb-item active" aria-current="page">{{ event.title }}</li></ol></nav>
+      <h1 class="display-6 mb-2">{{ event.title }}</h1>
+      <p class="text-body-secondary mb-0">
+        <i class="bi bi-calendar3 me-1" aria-hidden="true"></i><time datetime="{{ event.starts_at|date:'c' }}">{{ event.starts_at|date:"l j F Y, H:i" }} UTC</time>
+        <span class="mx-2" aria-hidden="true">&middot;</span>
+        <i class="bi bi-geo-alt me-1" aria-hidden="true"></i>{{ event.venue }}
+      </p>
+      {% if event.description %}<p class="mt-3 mb-0">{{ event.description|linebreaksbr }}</p>{% endif %}
+    </div>
+  </section>
+
+  <section class="container" aria-labelledby="seat-heading">
+    <div class="card">
+      <div class="card-body p-3 p-md-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+          <h2 id="seat-heading" class="h5 fw-bold mb-0">Choose your seats</h2>
+          <div class="seat-legend" aria-label="Seat legend">
+            <span class="d-inline-flex align-items-center gap-2"><span class="seat seat-available" aria-hidden="true"><i class="bi bi-square"></i></span>Available</span>
+            <span class="d-inline-flex align-items-center gap-2"><span class="seat seat-selected-sample" aria-hidden="true"><i class="bi bi-check-lg"></i></span>Selected</span>
+            <span class="d-inline-flex align-items-center gap-2"><span class="seat seat-held" aria-hidden="true"><i class="bi bi-hourglass-split"></i></span>Held</span>
+            <span class="d-inline-flex align-items-center gap-2"><span class="seat seat-booked" aria-hidden="true"><i class="bi bi-lock-fill"></i></span>Booked</span>
+            <span class="small text-body-secondary d-none" data-refresh-spinner><span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>Updating</span>
+          </div>
+        </div>
+
+        {% if not has_seats %}
+          <div class="empty-state"><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i><p class="mt-3 mb-0">Seats for this event are not available yet.</p></div>
+        {% else %}
+          <form method="post" action="{% url 'event-hold' event.pk %}" data-seat-form data-submit-once
+                data-max-seats="{{ event.max_seats_per_booking }}"
+                data-seat-map-url="{% url 'api-event-seats' event.pk %}">
+            {% csrf_token %}
+            <div class="stage mb-3" aria-hidden="true">Stage</div>
+            <fieldset class="seat-grid">
+              <legend class="visually-hidden">Seats, up to {{ event.max_seats_per_booking }} per booking</legend>
+              {% for row_label, seats in rows %}
+                <div class="seat-row">
+                  <span class="seat-row-label" aria-hidden="true">{{ row_label }}</span>
+                  {% for seat in seats %}
+                    <input type="checkbox" class="seat-input" name="seat_ids" value="{{ seat.pk }}" id="seat-{{ seat.pk }}"
+                           data-label="{{ seat.label }}" data-price="{{ seat.price }}"
+                           {% if seat.status != "available" or not bookable %}disabled{% endif %}
+                           {% if seat.pk in selected_ids %}checked{% endif %}>
+                    <label class="seat seat-{{ seat.status }}" for="seat-{{ seat.pk }}" title="{{ seat.label }} &middot; {{ seat.price }}">
+                      {% if seat.status == "available" %}<i class="bi bi-square icon-status icon-available" aria-hidden="true"></i>{% elif seat.status == "held" %}<i class="bi bi-hourglass-split icon-status" aria-hidden="true"></i>{% else %}<i class="bi bi-lock-fill icon-status" aria-hidden="true"></i>{% endif %}
+                      <i class="bi bi-check-lg icon-selected" aria-hidden="true"></i>
+                      <span aria-hidden="true">{{ seat.number }}</span>
+                      <span class="visually-hidden">Seat {{ seat.label }}, price {{ seat.price }}, </span><span class="visually-hidden seat-status-text">{% if seat.status == "held" %}held by another customer{% else %}{{ seat.status }}{% endif %}</span>
+                    </label>
+                  {% endfor %}
+                  <span class="seat-row-label" aria-hidden="true">{{ row_label }}</span>
+                </div>
+              {% endfor %}
+            </fieldset>
+
+            <div class="alert alert-warning d-none mt-3" role="alert" data-limit-notice></div>
+
+            <div class="selection-summary card mt-3">
+              <div class="card-body d-flex flex-wrap gap-3 align-items-center justify-content-between">
+                <div>
+                  <p class="mb-0 small text-body-secondary">Up to {{ event.max_seats_per_booking }} seats per booking. Your hold lasts {{ hold_minutes }} minutes.</p>
+                  <p class="mb-0 fw-semibold d-none" data-selection-summary aria-live="polite"><i class="bi bi-ticket me-1" aria-hidden="true"></i><span data-selection-text></span></p>
+                </div>
+                {% if not bookable %}
+                  <span class="badge text-bg-secondary"><i class="bi bi-clock me-1" aria-hidden="true"></i>This event has started</span>
+                {% elif user.is_authenticated and not user.is_customer %}
+                  <span class="small text-body-secondary">Seats can be held by customer accounts.</span>
+                {% elif user.is_authenticated %}
+                  <div class="d-flex flex-wrap gap-2 align-items-center">
+                  <label class="visually-hidden" for="promo-code">Promo code</label>
+                  <input type="text" class="form-control w-auto" id="promo-code" name="promo_code" maxlength="40" placeholder="Promo code (optional)" autocomplete="off">
+                  <button type="submit" class="btn btn-primary btn-lg" data-loading-text="Holding seats...">
+                    <i class="bi bi-lock me-1" aria-hidden="true"></i>Hold seats
+                  </button>
+                  </div>
+                {% else %}
+                  <a class="btn btn-primary btn-lg" href="{% url 'login' %}?next={{ request.path|urlencode }}">Log in to hold seats</a>
+                {% endif %}
+              </div>
+            </div>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/seat-map.js' %}"></script>
+{% endblock %}

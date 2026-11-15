@@ -1,0 +1,4 @@
+{# Event status with colour, icon and text. Expects: status #}
+{% if status == "published" %}<span class="badge text-bg-success"><i class="bi bi-broadcast me-1" aria-hidden="true"></i>Published</span>
+{% elif status == "cancelled" %}<span class="badge text-bg-danger"><i class="bi bi-x-octagon me-1" aria-hidden="true"></i>Cancelled</span>
+{% else %}<span class="badge text-bg-secondary"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Draft</span>{% endif %}

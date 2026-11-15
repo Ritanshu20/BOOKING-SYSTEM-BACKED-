@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load booking_tags %}
+
+{% block title %}Cancel booking {{ booking.pk }}{% endblock %}
+
+{% block content %}
+  <div class="container py-5">
+    <div class="card mx-auto narrow-panel">
+      <div class="card-body p-4 p-md-5">
+        <h1 class="h4 fw-bold mb-1">Cancel this booking?</h1>
+        <p class="text-body-secondary">{{ booking.event.title }} &middot; Seats {% for item in booking.items.all %}{{ item.seat.label }}{% if not forloop.last %}, {% endif %}{% endfor %} &middot; {% status_badge booking %}</p>
+
+        {% if status == "confirmed" %}
+          <div class="surface-muted p-3 my-4" aria-label="Refund preview">
+            <div class="d-flex justify-content-between"><span>Paid</span><span>{{ quote.paid_amount }}</span></div>
+            <div class="d-flex justify-content-between"><span>Refund rate</span><span>{{ quote.refund_percent }}%</span></div>
+            <hr>
+            <div class="d-flex justify-content-between fw-bold fs-5"><span>You will get back</span><span data-refund-amount>{{ quote.refund_amount }}</span></div>
+          </div>
+          <ul class="small text-body-secondary ps-3" aria-label="Refund policy">
+            {% for tier in refund_tiers %}
+              <li>{{ tier.refund_percent }}% refund when cancelling at least {{ tier.min_hours_before_start }} hours before the start</li>
+            {% endfor %}
+          </ul>
+        {% elif status == "pending" %}
+          <p class="my-4">You have not paid yet, so nothing is charged. Your seats are released immediately.</p>
+        {% else %}
+          <p class="my-4">This booking can no longer be cancelled.</p>
+        {% endif %}
+
+        <div class="d-flex gap-2 mt-4">
+          {% if status == "confirmed" or status == "pending" %}
+            <form method="post" data-submit-once>
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger" data-loading-text="Cancelling..."><i class="bi bi-x-circle me-1" aria-hidden="true"></i>Yes, cancel</button>
+            </form>
+          {% endif %}
+          <a class="btn btn-outline-secondary" href="{% url 'booking-detail' booking.pk %}">Keep my booking</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

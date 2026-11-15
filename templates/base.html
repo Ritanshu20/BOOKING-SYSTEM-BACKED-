@@ -1,0 +1,90 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>{% block title %}Events{% endblock %} | Booking</title>
+  <script src="{% static 'js/theme.js' %}"></script>
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+        crossorigin="anonymous">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.2/font/bootstrap-icons.min.css"
+        integrity="sha384-nWN3KqaaVcbEsCjLSV+2jMjh62Iny/+mN3srM8TZeM8N6aj7eDl5wwYggjAJ4/sJ"
+        crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body class="d-flex flex-column min-vh-100">
+  <a class="visually-hidden-focusable btn btn-primary m-2 position-absolute" href="#main">Skip to content</a>
+
+  <nav class="navbar navbar-expand-md site-navbar" aria-label="Main navigation">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{% url 'home' %}">
+        <span class="brand-mark" aria-hidden="true"><i class="bi bi-ticket-perforated"></i></span>
+        Booking
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav-links"
+              aria-controls="nav-links" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav-links">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link" href="{% url 'home' %}"><i class="bi bi-calendar-event me-1" aria-hidden="true"></i>Events</a></li>
+          {% if user.is_authenticated and user.is_customer %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'booking-list' %}"><i class="bi bi-bookmark-check me-1" aria-hidden="true"></i>My bookings</a></li>
+          {% endif %}
+          {% if user.is_organizer or user.is_admin_role %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'organizer-events' %}"><i class="bi bi-easel me-1" aria-hidden="true"></i>My events</a></li>
+          {% endif %}
+        </ul>
+        <ul class="navbar-nav align-items-md-center gap-md-2">
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <span class="navbar-text small"><i class="bi bi-person-circle me-1" aria-hidden="true"></i>{{ user.username }} <span class="badge text-bg-light border ms-1">{{ user.get_role_display }}</span></span>
+            </li>
+            <li class="nav-item">
+              <form method="post" action="{% url 'logout' %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-secondary">Log out</button>
+              </form>
+            </li>
+          {% else %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Log in</a></li>
+            <li class="nav-item"><a class="btn btn-sm btn-primary" href="{% url 'register' %}">Sign up</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="toast-stack" aria-live="polite" aria-atomic="true">
+    {% for message in messages %}
+      <div class="toast show align-items-center text-bg-{{ message.tags|default:'secondary' }} border-0" role="status">
+        <div class="d-flex">
+          <div class="toast-body">{{ message }}</div>
+          <button type="button" class="btn-close {% if message.tags != 'warning' %}btn-close-white {% endif %}me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <main id="main" class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer py-4 mt-5">
+    <div class="container small d-flex flex-wrap justify-content-between gap-2">
+      <span>Booking demo. Payments run in test mode; no real money moves.</span>
+      <span>All times are shown in UTC.</span>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+          crossorigin="anonymous"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

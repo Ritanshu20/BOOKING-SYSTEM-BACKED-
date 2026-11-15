@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environment
+.venv/
+venv/
+
+# Local configuration and secrets
+.env
+*.pem
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+media/
+
+# Tooling caches
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local assistant working instructions (not part of the project)
+BOOKING_CLAUDE.md
+CLAUDE.md
+
+# Personal study and planning notes (kept on the developer's machine only)
+docs/PROGRESS.md
+docs/INTERVIEW_NOTES.md
+docs/EXPLAIN_IN_5_MINUTES.md
+docs/LEARN_HINGLISH.md
+docs/DEMO_SCRIPT.md
+
+# Editors and OS files
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store

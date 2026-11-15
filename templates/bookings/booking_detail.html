@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static booking_tags %}
+
+{% block title %}Booking {{ booking.pk }}{% endblock %}
+
+{% block content %}
+  <section class="page-header">
+    <div class="container">
+      <nav aria-label="breadcrumb"><ol class="breadcrumb small mb-2"><li class="breadcrumb-item"><a href="{% url 'booking-list' %}">My bookings</a></li><li class="breadcrumb-item active" aria-current="page">Booking {{ booking.pk }}</li></ol></nav>
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <h1 class="display-6 mb-0">{{ booking.event.title }}</h1>
+        {% status_badge booking %}
+      </div>
+      <p class="text-body-secondary mt-2 mb-0"><i class="bi bi-calendar3 me-1" aria-hidden="true"></i><time datetime="{{ booking.event.starts_at|date:'c' }}">{{ booking.event.starts_at|date:"l j F Y, H:i" }} UTC</time> &middot; <i class="bi bi-geo-alt me-1" aria-hidden="true"></i>{{ booking.event.venue }}</p>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="row g-4">
+      <div class="col-12 col-lg-7">
+        <div class="card h-100">
+          <div class="card-body p-4">
+            <h2 class="h5 fw-bold mb-3">Seats</h2>
+            <ul class="list-group list-group-flush mb-3">
+              {% for item in booking.items.all %}
+                <li class="list-group-item d-flex justify-content-between px-0">
+                  <span><i class="bi bi-ticket me-2" aria-hidden="true"></i>Seat {{ item.seat.label }}</span>
+                  <span>{{ item.price_at_booking }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+            {% if booking.discount_amount %}
+              <div class="d-flex justify-content-between"><span>Subtotal</span><span>{{ booking.subtotal_amount }}</span></div>
+              <div class="d-flex justify-content-between text-success"><span><i class="bi bi-tag me-1" aria-hidden="true"></i>Promo {{ booking.promo_code.code }}</span><span>-{{ booking.discount_amount }}</span></div>
+            {% endif %}
+            <div class="d-flex justify-content-between fw-bold fs-5"><span>Total</span><span>{{ booking.total_amount }}</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-5">
+        <div class="card h-100">
+          <div class="card-body p-4">
+            {% if can_pay %}
+              <h2 class="h5 fw-bold">Complete your payment</h2>
+              <div class="surface-muted p-3 my-3 text-center" data-countdown data-expires-at="{{ booking.expires_at|date:'c' }}">
+                <div class="small text-body-secondary">Hold expires in</div>
+                <div class="countdown" data-countdown-value aria-live="off">--:--</div>
+                <div class="small">at <time datetime="{{ booking.expires_at|date:'c' }}">{{ booking.expires_at|date:"H:i:s" }} UTC</time></div>
+              </div>
+              <div class="alert alert-warning d-none" role="alert" data-expired-notice>
+                <i class="bi bi-clock-history me-1" aria-hidden="true"></i>This hold has expired. Hold the seats again to book them.
+              </div>
+              {% if is_owner %}
+                <form method="post" action="{% url 'booking-pay' booking.pk %}" data-submit-once class="mb-2">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-primary btn-lg w-100" data-requires-active-hold data-loading-text="Processing payment...">
+                    <i class="bi bi-credit-card me-1" aria-hidden="true"></i>Pay {{ booking.total_amount }} (test mode)
+                  </button>
+                </form>
+                <a class="btn btn-outline-danger w-100" href="{% url 'booking-cancel' booking.pk %}">Cancel this hold</a>
+                <p class="small text-body-secondary mt-3 mb-0">Test mode: the payment provider is simulated and calls our signed webhook, exactly like a real gateway.</p>
+              {% endif %}
+            {% elif status == "confirmed" %}
+              <h2 class="h5 fw-bold"><i class="bi bi-check-circle-fill text-success me-1" aria-hidden="true"></i>You're going!</h2>
+              <p class="text-body-secondary">Confirmed on <time datetime="{{ booking.confirmed_at|date:'c' }}">{{ booking.confirmed_at|date:"j M Y, H:i" }} UTC</time>.</p>
+              {% if is_owner %}<a class="btn btn-outline-danger" href="{% url 'booking-cancel' booking.pk %}">Cancel booking</a>{% endif %}
+            {% elif status == "cancelled" %}
+              <h2 class="h5 fw-bold">Booking cancelled</h2>
+              <p class="text-body-secondary mb-0">Cancelled on <time datetime="{{ booking.cancelled_at|date:'c' }}">{{ booking.cancelled_at|date:"j M Y, H:i" }} UTC</time>. Your seats were released.</p>
+            {% else %}
+              <h2 class="h5 fw-bold">Hold expired</h2>
+              <p class="text-body-secondary">This hold ran out before payment, so the seats were released.</p>
+              <a class="btn btn-primary" href="{% url 'event-detail' booking.event_id %}">Choose seats again</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  {% if can_pay %}<script src="{% static 'js/countdown.js' %}"></script>{% endif %}
+{% endblock %}

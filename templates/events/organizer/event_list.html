@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}My events{% endblock %}
+
+{% block content %}
+  <section class="page-header">
+    <div class="container d-flex flex-wrap justify-content-between align-items-end gap-3">
+      <div>
+        <h1 class="display-6 mb-1">My events</h1>
+        <p class="text-body-secondary mb-0">Create events, add seats, publish, and follow sales.</p>
+      </div>
+      {% if user.is_organizer %}
+        <a class="btn btn-primary" href="{% url 'organizer-event-create' %}"><i class="bi bi-plus-lg me-1" aria-hidden="true"></i>New event</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="container" aria-label="Your events">
+    {% if page.object_list %}
+      <div class="card">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead><tr><th scope="col">Event</th><th scope="col">Starts (UTC)</th><th scope="col">Status</th><th scope="col" class="text-end">Seats</th><th scope="col" class="text-end">Actions</th></tr></thead>
+            <tbody>
+              {% for event in page.object_list %}
+                <tr>
+                  <td><a class="fw-semibold text-reset" href="{% url 'organizer-event-manage' event.pk %}">{{ event.title }}</a><div class="small text-body-secondary">{{ event.venue }}</div></td>
+                  <td class="text-nowrap">{{ event.starts_at|date:"j M Y, H:i" }}</td>
+                  <td>{% include "partials/event_status_badge.html" with status=event.status %}</td>
+                  <td class="text-end">{{ event.seat_count }}</td>
+                  <td class="text-end text-nowrap">
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'organizer-event-manage' event.pk %}">Manage</a>
+                    <a class="btn btn-sm btn-outline-secondary" href="{% url 'organizer-event-report' event.pk %}">Report</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% include "partials/pagination.html" %}
+    {% else %}
+      <div class="card empty-state">
+        <i class="bi bi-calendar-plus" aria-hidden="true"></i>
+        <h2 class="h5 mt-3">No events yet</h2>
+        <p class="mb-3">Create your first event, add a seat grid, then publish it.</p>
+        {% if user.is_organizer %}<a class="btn btn-primary" href="{% url 'organizer-event-create' %}">Create an event</a>{% endif %}
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}

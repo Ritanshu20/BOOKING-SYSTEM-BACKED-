@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Manage {{ event.title }}{% endblock %}
+
+{% block content %}
+  <section class="page-header">
+    <div class="container">
+      <nav aria-label="breadcrumb"><ol class="breadcrumb small mb-2"><li class="breadcrumb-item"><a href="{% url 'organizer-events' %}">My events</a></li><li class="breadcrumb-item active" aria-current="page">{{ event.title }}</li></ol></nav>
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <h1 class="display-6 mb-0">{{ event.title }}</h1>
+        {% include "partials/event_status_badge.html" with status=event.status %}
+      </div>
+      <p class="text-body-secondary mt-2 mb-0"><i class="bi bi-calendar3 me-1" aria-hidden="true"></i>{{ event.starts_at|date:"l j F Y, H:i" }} UTC &middot; <i class="bi bi-geo-alt me-1" aria-hidden="true"></i>{{ event.venue }}</p>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="row g-4">
+      <div class="col-12 col-lg-7">
+        <div class="card h-100">
+          <div class="card-body p-4">
+            <h2 class="h5 fw-bold mb-3">Details</h2>
+            <dl class="row mb-0">
+              <dt class="col-sm-5">Seats</dt><dd class="col-sm-7">{{ event.seat_count }}</dd>
+              <dt class="col-sm-5">Max seats per booking</dt><dd class="col-sm-7">{{ event.max_seats_per_booking }}</dd>
+              <dt class="col-sm-5">Description</dt><dd class="col-sm-7">{{ event.description|default:"-"|linebreaksbr }}</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-lg-5">
+        <div class="card h-100">
+          <div class="card-body p-4 d-grid gap-2">
+            <h2 class="h5 fw-bold">Actions</h2>
+            {% if can_generate_seats %}
+              <a class="btn btn-primary" href="{% url 'organizer-event-seats' event.pk %}"><i class="bi bi-grid-3x3-gap me-1" aria-hidden="true"></i>Generate seats</a>
+            {% endif %}
+            {% if can_publish %}
+              <form method="post" action="{% url 'organizer-event-publish' event.pk %}" data-submit-once class="d-grid">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary" data-loading-text="Publishing..."><i class="bi bi-broadcast me-1" aria-hidden="true"></i>Publish</button>
+              </form>
+            {% endif %}
+            {% if can_unpublish %}
+              <a class="btn btn-outline-primary" href="{% url 'event-detail' event.pk %}"><i class="bi bi-eye me-1" aria-hidden="true"></i>View public page</a>
+              <form method="post" action="{% url 'organizer-event-unpublish' event.pk %}" data-submit-once class="d-grid">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-secondary" data-loading-text="Unpublishing...">Move back to draft</button>
+              </form>
+            {% endif %}
+            {% if can_edit %}
+              <a class="btn btn-outline-secondary" href="{% url 'organizer-event-edit' event.pk %}"><i class="bi bi-pencil me-1" aria-hidden="true"></i>Edit details</a>
+            {% endif %}
+            <a class="btn btn-outline-secondary" href="{% url 'organizer-event-report' event.pk %}"><i class="bi bi-bar-chart me-1" aria-hidden="true"></i>Sales report</a>
+            {% if can_cancel %}
+              <a class="btn btn-outline-danger" href="{% url 'organizer-event-cancel' event.pk %}"><i class="bi bi-x-octagon me-1" aria-hidden="true"></i>Cancel event</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+{% endblock %}

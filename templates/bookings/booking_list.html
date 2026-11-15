@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load booking_tags %}
+
+{% block title %}My bookings{% endblock %}
+
+{% block content %}
+  <section class="page-header">
+    <div class="container">
+      <h1 class="display-6 mb-4">My bookings</h1>
+      <div class="row g-3" aria-label="Booking summary">
+        <div class="col-6 col-md-3"><div class="stat"><div class="small text-body-secondary">Confirmed</div><div class="stat-value">{{ summary.confirmed }}</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat"><div class="small text-body-secondary">Upcoming</div><div class="stat-value">{{ summary.upcoming_confirmed }}</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat"><div class="small text-body-secondary">Total paid</div><div class="stat-value">{{ summary.total_paid }}</div></div></div>
+        <div class="col-6 col-md-3"><div class="stat"><div class="small text-body-secondary">Refunded</div><div class="stat-value">{{ summary.total_refunded }}</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container" aria-label="Bookings">
+    {% if page.object_list %}
+      <div class="card">
+        <ul class="list-group list-group-flush">
+          {% for booking in page.object_list %}
+            <li class="list-group-item p-3 p-md-4">
+              <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                <div>
+                  <div class="mb-1">{% status_badge booking %}</div>
+                  <h2 class="h6 fw-bold mb-1"><a class="text-reset" href="{% url 'booking-detail' booking.pk %}">{{ booking.event.title }}</a></h2>
+                  <p class="small text-body-secondary mb-0">
+                    <time datetime="{{ booking.event.starts_at|date:'c' }}">{{ booking.event.starts_at|date:"D j M Y, H:i" }} UTC</time>
+                    &middot; Seats {% for item in booking.items.all %}{{ item.seat.label }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                    &middot; {{ booking.total_amount }}
+                  </p>
+                </div>
+                <div class="d-flex gap-2">
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'booking-detail' booking.pk %}">Details</a>
+                  {% if booking.status == "confirmed" or booking.status == "pending" %}
+                    <a class="btn btn-sm btn-outline-danger" href="{% url 'booking-cancel' booking.pk %}">Cancel</a>
+                  {% endif %}
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% include "partials/pagination.html" %}
+    {% else %}
+      <div class="card empty-state">
+        <i class="bi bi-ticket-perforated" aria-hidden="true"></i>
+        <h2 class="h5 mt-3">No bookings yet</h2>
+        <p class="mb-3">When you hold seats for an event, they appear here.</p>
+        <a class="btn btn-primary" href="{% url 'home' %}">Browse events</a>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}
