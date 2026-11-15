@@ -243,5 +243,3 @@ off) creates, without duplicates when run again:
 ## Not included
 
 - Deployment (production settings exist; hosting and scheduling are a later phase).
-- Tickets and organizer check-in (optional feature F3, skipped).
-- Real payment gateways: the provider is test mode only.
